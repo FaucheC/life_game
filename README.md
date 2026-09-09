@@ -11,6 +11,8 @@ Chaque "être vivant" pourra choisir la direction de son déplacement.
 
 
 # règles et fonctionnement du projet
+Chaque agent aura une certaines vision de case autour de lui
+Les actions possibles 
 
 
 # Récompenses de l'IA

@@ -12,8 +12,8 @@ from functions.generate_grid import grille_aleatoire
 from functions.death_grid import grille_vide
 
 # --- Constantes de l'affichage ---
-LARGEUR, HAUTEUR = 800, 600
-TAILLE_CELLULE = 10
+LARGEUR, HAUTEUR = 900, 600
+TAILLE_CELLULE = 5
 COLONNES = LARGEUR // TAILLE_CELLULE
 LIGNES = HAUTEUR // TAILLE_CELLULE
 
