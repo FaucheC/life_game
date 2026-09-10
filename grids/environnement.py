@@ -11,7 +11,7 @@ class Environnement(object):
         self.largeur, self.hauteur = largeur, hauteur
         self.colonnes = self.largeur // taille_cellule
         self.lignes = self.hauteur // taille_cellule
-
+        self.taille_cellule = taille_cellule
 
 
     def compter_voisins(self, grille, x, y):
@@ -75,3 +75,43 @@ class Environnement(object):
                     if voisins == 3:
                         nouvelle[i][j] = 1
         return nouvelle
+
+
+    def grille_aleatoire(self, probabilite_vivante=0.2):
+        """
+        Génère une grille de cellules aléatoires.
+
+        Parameters:
+        -----------
+        probabilite_vivante : float, optionnel (par défaut 0.2)
+            Probabilité qu'une cellule soit vivante (1) au départ.
+
+        Returns:
+        --------
+        numpy.ndarray
+            Une grille de dimensions (LIGNES, COLONNES) avec des 0 (mort) et des 1 (vivant).
+        """
+        return np.random.choice([0, 1], size=(self.lignes, self.colonnes), p=[1 - probabilite_vivante, probabilite_vivante])
+
+    def grille_vide(self):
+        """
+        Crée une grille entièrement composée de cellules mortes.
+
+        Returns:
+        --------
+        numpy.ndarray
+            Une grille de dimensions (LIGNES, COLONNES) remplie de 0.
+        """
+        return np.zeros((self.lignes, self.colonnes), dtype=int)
+
+
+
+    def get_observation(self):
+        """
+        Vision de l'agent
+        """
+
+    def moove(agent, dx, dy):
+        """
+        Déplace l'agent
+        """
