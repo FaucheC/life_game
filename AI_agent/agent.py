@@ -1,5 +1,4 @@
 
-
 class Agent(object):
     """
     This is class create an Agent who follow rules of life game (see Readme.md)
