@@ -2,12 +2,13 @@ import numpy as np
 
 class Environnement(object):
     """
+    uniquement np.array
 
     """
 
-    def __init__(self, taille_cellule = 5):
+    def __init__(self, largeur = 900, hauteur = 600, taille_cellule = 5):
 
-        self.largeur, self.hauteur = 900, 600
+        self.largeur, self.hauteur = largeur, hauteur
         self.colonnes = self.largeur // taille_cellule
         self.lignes = self.hauteur // taille_cellule
 
