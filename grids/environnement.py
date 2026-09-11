@@ -115,3 +115,14 @@ class Environnement(object):
         """
         Déplace l'agent
         """
+
+    def fight(agent_1, agent_2):
+        """
+        l'agent attaque unn autre agent pour essayer d'obtenir de la nourriture
+        """
+
+    def reproduce(agent):
+        """
+        l'agent se reproduit si son niveau d'énergie le lui permet
+        """
+
