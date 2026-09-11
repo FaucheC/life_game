@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class Environnement(object):
     """
@@ -91,7 +92,15 @@ class Environnement(object):
         numpy.ndarray
             Une grille de dimensions (LIGNES, COLONNES) avec des 0 (mort) et des 1 (vivant).
         """
-        return np.random.choice([0, 1], size=(self.lignes, self.colonnes), p=[1 - probabilite_vivante, probabilite_vivante])
+        #création de la gris aléatoire
+        random_grid = np.random.choice([0, 1], size=(self.lignes, self.colonnes), p=[1 - probabilite_vivante, probabilite_vivante])
+
+        #ajout de la nourriture   (self.colonnes * self.lignes) - 1 x,y colonne ligne
+        for n in range(1, 10):
+            x,y = random.randint(1, self.colonnes), random.randint(1, self.lignes)
+            random_grid[y][x] = 2
+
+        return random_grid
 
     def grille_vide(self):
         """
@@ -105,6 +114,17 @@ class Environnement(object):
         return np.zeros((self.lignes, self.colonnes), dtype=int)
 
 
+    def save_state(self):
+        """
+        Cette fonction sers à sauvegarder l'état de la grille du life game
+        """
+
+    def load_state(self):
+        """
+        Cette fonction permet de charger l'état d'une grille précédente
+        """
+
+    ########## Partie de l'environnement spécifique aux actions de l'agent
 
     def get_observation(self):
         """

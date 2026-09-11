@@ -23,7 +23,15 @@ def afficher_grille(grille, LIGNES, COLONNES, TAILLE_CELLULE, ecran):
 
     for i in range(LIGNES):
         for j in range(COLONNES):
-            couleur = VERT if grille[i][j] == 1 else GRIS
+            if grille[i][j] == 1:
+                couleur = VERT
+
+            elif grille[i][j] == 2:
+                couleur = ROUGE
+
+            elif grille[i][j] == 0:
+                couleur = GRIS
+            
             pygame.draw.rect(ecran, couleur,
                              (j * TAILLE_CELLULE, i * TAILLE_CELLULE,
                               TAILLE_CELLULE - 1, TAILLE_CELLULE - 1))  # -1 pour laisser un espace visuel

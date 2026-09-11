@@ -22,3 +22,6 @@ class QNetwork(nn.Module):
     def forward(self, x):
         """Retourne les Q-valeurs pour chaque action."""
         return self.net(x)
+
+
+#TODO: implémenter la sauvegarde et le chargement du qnetwork pour pouvoir être réutilisé derrière
