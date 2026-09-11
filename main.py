@@ -53,6 +53,8 @@ if __name__ == "__main__":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     pause = not pause
+                if event.key == pygame.K_s:
+                    Env.save_state(grille)
                 if event.key == pygame.K_r:
                     grille = Env.grille_aleatoire(0.2)
                 if event.key == pygame.K_c:

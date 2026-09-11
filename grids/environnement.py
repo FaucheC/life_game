@@ -97,7 +97,7 @@ class Environnement(object):
 
         #ajout de la nourriture   (self.colonnes * self.lignes) - 1 x,y colonne ligne
         for n in range(1, 10):
-            x,y = random.randint(1, self.colonnes), random.randint(1, self.lignes)
+            x,y = random.randint(1, self.colonnes-1), random.randint(1, self.lignes-1)
             random_grid[y][x] = 2
 
         return random_grid
@@ -114,15 +114,20 @@ class Environnement(object):
         return np.zeros((self.lignes, self.colonnes), dtype=int)
 
 
-    def save_state(self):
+    def save_state(self, grille, path = "C:/A_Personnel/life_game/utils/grille.npy"):
         """
         Cette fonction sers à sauvegarder l'état de la grille du life game
         """
+        np.save(path, grille)
 
-    def load_state(self):
+
+    def load_state(self, path = "C:/A_Personnel/life_game/utils/grille.npy"):
         """
         Cette fonction permet de charger l'état d'une grille précédente
         """
+        grille = np.load(path)
+
+        return grille
 
     ########## Partie de l'environnement spécifique aux actions de l'agent
 
