@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from collections import deque
 
 class Environnement(object):
     """
@@ -46,6 +47,8 @@ class Environnement(object):
                 somme += grille[ligne][colonne]
         return somme
 
+    
+
     def prochaine_generation(self, grille):
         """
         Calcule la génération suivante selon les règles de Conway.
@@ -76,6 +79,8 @@ class Environnement(object):
                     if voisins == 3:
                         nouvelle[i][j] = 1
         return nouvelle
+
+    
 
 
     def grille_aleatoire(self, probabilite_vivante=0.2):
@@ -129,6 +134,11 @@ class Environnement(object):
 
         return grille
 
+    def create_agent(self):
+        """
+        fonction servant à créer les agents si l'assemblage de cellule le permet
+        """
+
     ########## Partie de l'environnement spécifique aux actions de l'agent
 
     def get_observation(self):
@@ -136,18 +146,22 @@ class Environnement(object):
         Vision de l'agent
         """
 
-    def moove(agent, dx, dy):
+    def moove(self, agent, dx, dy):
         """
         Déplace l'agent
         """
 
-    def fight(agent_1, agent_2):
+
+    def fight(self, agent_1, agent_2):
         """
         l'agent attaque unn autre agent pour essayer d'obtenir de la nourriture
         """
 
-    def reproduce(agent):
+    def reproduce(self, agent):
         """
         l'agent se reproduit si son niveau d'énergie le lui permet
         """
+
+        if agent.energie > 1000000:
+            pass
 
