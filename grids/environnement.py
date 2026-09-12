@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from collections import deque
+from functions.compter_agent import extraire_agents_potentiels
 
 class Environnement(object):
     """
@@ -51,12 +52,15 @@ class Environnement(object):
 
     def prochaine_generation(self, grille):
         """
-        Calcule la génération suivante selon les règles de Conway.
+        Calcule la génération suivante selon les règles de Conway,
+        puis élimine les amas de cellules vivantes de moins de 5 cellules.
 
-        Règles :
-            - Une cellule vivante avec 2 ou 3 voisins survivent.
+        Règles de Conway :
+            - Une cellule vivante avec 2 ou 3 voisins survit.
             - Une cellule vivante avec moins de 2 ou plus de 3 voisins meurt.
             - Une cellule morte avec exactement 3 voisins naît.
+
+        Ensuite, seuls les amas (composantes connexes) de 5 cellules ou plus sont conservés.
 
         Parameters:
         -----------
@@ -66,20 +70,30 @@ class Environnement(object):
         Returns:
         --------
         numpy.ndarray
-            La nouvelle grille après application des règles.
+            La nouvelle grille après application des règles et filtrage des amas.
         """
-        nouvelle = np.copy(grille)
-        for i in range(self.lignes):
-            for j in range(self.colonnes):
-                voisins = self.compter_voisins(grille, i, j)
-                if grille[i][j] == 1:
-                    if voisins < 2 or voisins > 3:
-                        nouvelle[i][j] = 0
-                else:
-                    if voisins == 3:
-                        nouvelle[i][j] = 1
-        return nouvelle
+        # 1. Appliquer les règles de Conway classiques
+        #nouvelle = np.copy(grille)
+        #for i in range(self.lignes):
+        #    for j in range(self.colonnes):
+        #        voisins = self.compter_voisins(grille, i, j)
+        #        if grille[i][j] == 1:
+        #            if voisins < 2 or voisins > 3:
+        #                nouvelle[i][j] = 0
+        #        else:
+        #            if voisins == 3:
+        #                nouvelle[i][j] = 1
 
+        # 2. Identifier les amas de 5 cellules ou plus dans la nouvelle grille
+        resultat = extraire_agents_potentiels(grille, taille_min=5, connectivite=8)
+
+        # 3. Construire une grille ne contenant que les cellules des amas survivants
+        grille_finale = np.zeros_like(grille)
+        for agent in resultat["agents"]:
+            for (i, j) in agent["cellules"]:
+                grille_finale[i][j] = 1
+
+        return grille_finale
     
 
 
