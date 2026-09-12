@@ -1,3 +1,5 @@
+from AI_agent.q_network import QNetwork
+
 
 class Agent(object):
     """
