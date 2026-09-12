@@ -65,7 +65,11 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # clic gauche
                     souris_x, souris_y = pygame.mouse.get_pos()
-                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, grille)
+                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, grille, clic="gauche")
+
+                if event.button == 3:  #clic droit
+                    souris_x, souris_y = pygame.mouse.get_pos()
+                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, grille, clic="droit")
 
         # --- Mise à jour de la simulation ---
         if not pause:
