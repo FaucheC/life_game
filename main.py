@@ -12,7 +12,7 @@ from grids.environnement import Environnement
 if __name__ == "__main__":
     # --- Constantes de l'affichage ---
     LARGEUR, HAUTEUR = 900, 600
-    TAILLE_CELLULE = 5
+    TAILLE_CELLULE = 25
     COLONNES = LARGEUR // TAILLE_CELLULE
     LIGNES = HAUTEUR // TAILLE_CELLULE
 
@@ -31,10 +31,16 @@ if __name__ == "__main__":
     horloge = pygame.time.Clock()
 
     #initialisation de l'environnement
-    Env = Environnement(largeur = 900, hauteur = 600, taille_cellule = 5)
+    Env = Environnement(largeur = 900, hauteur = 600, taille_cellule = 25)
+    load = True
 
     # --- Configuration initiale ---
-    grille = Env.grille_aleatoire(0.2)
+    if load is True:
+        grille = Env.load_state(path = "C:/A_Personnel/life_game/utils/grille.npy")
+
+    else:
+        grille = Env.grille_aleatoire(0.2)
+
     pause = True  # La simulation est en pause par défaut
     running = True
 

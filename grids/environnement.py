@@ -172,6 +172,9 @@ class Environnement(object):
         Déplace l'agent
         """
         #j'ai juste à faire +1 -1 pour les coordonnées de chaque cellules
+        #vérifier si on n'est pas hors limite
+        #condition pour supprimer les cellules mortes si elles ne sont pas encore vivantes dans le mouvement
+        
 
         agent.position = [[cell[0], cell[1] + 1] for cell in agent.position]
 
@@ -201,3 +204,4 @@ class Environnement(object):
 
 
 #TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)
+#charger une map vide avec un seul agent et une nourriture
