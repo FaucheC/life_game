@@ -63,7 +63,7 @@ def extraire_agents_potentiels(grille, taille_min=5, connectivite=8):
 
                 while file:
                     ci, cj = file.popleft()
-                    composante.append((ci, cj))
+                    composante.append([ci, cj])
 
                     for di, dj in voisins:
                         ni, nj = ci + di, cj + dj

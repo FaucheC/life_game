@@ -6,7 +6,7 @@ class Agent(object):
     This is class create an Agent who follow rules of life game (see Readme.md)
     """
 
-    def __init__(self, position: tuple, age: int, energie: int):
+    def __init__(self, position: list, age: int, energie: int):
 
         self.position = position
         self.age = age

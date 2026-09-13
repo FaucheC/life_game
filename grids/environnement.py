@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from collections import deque
+from AI_agent.agent import Agent
 from functions.compter_agent import extraire_agents_potentiels
 
 class Environnement(object):
@@ -15,6 +16,7 @@ class Environnement(object):
         self.colonnes = self.largeur // taille_cellule
         self.lignes = self.hauteur // taille_cellule
         self.taille_cellule = taille_cellule
+        self.nbr_agent = []
 
 
     def compter_voisins(self, grille, x, y):
@@ -87,13 +89,18 @@ class Environnement(object):
         # 2. Identifier les amas de 5 cellules ou plus dans la nouvelle grille
         resultat = extraire_agents_potentiels(grille, taille_min=5, connectivite=8)
 
-        # 3. Construire une grille ne contenant que les cellules des amas survivants
-        grille_finale = np.zeros_like(grille)
-        for agent in resultat["agents"]:
-            for (i, j) in agent["cellules"]:
-                grille_finale[i][j] = 1
+        agent = Agent(resultat["agents"][0]["cellules"], 0, 0)
+        grille = self.moove(grille, agent, 1, 0)
 
-        return grille_finale
+        # 3. Construire une grille ne contenant que les cellules des amas survivants
+        #grille_finale = np.zeros_like(grille)
+        #for agent in resultat["agents"]:
+        #    for (i, j) in agent["cellules"]:
+        #        grille_finale[i][j] = 1
+
+        #return grille_finale
+
+        return grille
     
 
 
@@ -160,10 +167,23 @@ class Environnement(object):
         Vision de l'agent
         """
 
-    def moove(self, agent, dx, dy):
+    def moove(self, grille, agent, dx, dy):
         """
         Déplace l'agent
         """
+        #j'ai juste à faire +1 -1 pour les coordonnées de chaque cellules
+
+        agent.position = [[cell[0], cell[1] + 1] for cell in agent.position]
+
+
+        for cellule in agent.position:
+            #faire avancer l'agent
+            grille[cellule[0]][cellule[1]] = 1
+            #supprimer les cellules qui doivent être supprimé
+            #grille[cellule[0]][cellule[1] - 1] = 0
+
+        return grille
+
 
 
     def fight(self, agent_1, agent_2):
@@ -179,3 +199,5 @@ class Environnement(object):
         if agent.energie > 1000000:
             pass
 
+
+#TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)

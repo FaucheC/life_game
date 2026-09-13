@@ -89,3 +89,8 @@ if __name__ == "__main__":
 
         pygame.display.flip()
         horloge.tick(10)  # 10 images par seconde (FPS)
+
+
+#TODO: instancier une classe pour chaque tas de cellule avec également leurs coordonnées
+#modifier les coordonnées de l'agent puis réafficher la carte
+#avant chaque déplacement, vérifier que les futurs coordonnées sont toujours dans la  carte
