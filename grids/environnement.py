@@ -52,7 +52,7 @@ class Environnement(object):
 
     
 
-    def prochaine_generation(self, grille):
+    def prochaine_generation(self, grille, dx, dy):
         """
         Calcule la génération suivante selon les règles de Conway,
         puis élimine les amas de cellules vivantes de moins de 5 cellules.
@@ -90,7 +90,7 @@ class Environnement(object):
         resultat = extraire_agents_potentiels(grille, taille_min=5, connectivite=8)
 
         agent = Agent(resultat["agents"][0]["cellules"], 0, 0)
-        grille = self.moove(grille, agent, 1, 0)
+        grille = self.moove(grille, agent, dx, dy)
 
         # 3. Construire une grille ne contenant que les cellules des amas survivants
         #grille_finale = np.zeros_like(grille)
@@ -167,23 +167,35 @@ class Environnement(object):
         Vision de l'agent
         """
 
-    def moove(self, grille, agent, dx, dy):
+    def moove(self, grille, agent, dx = 1, dy = 1):
         """
         Déplace l'agent
         """
-        #j'ai juste à faire +1 -1 pour les coordonnées de chaque cellules
-        #vérifier si on n'est pas hors limite
-        #condition pour supprimer les cellules mortes si elles ne sont pas encore vivantes dans le mouvement
-        
+        #TODO: mettre des conditions si la valeurs de x ou y sors de la grille
 
-        agent.position = [[cell[0], cell[1] + 1] for cell in agent.position]
+        ancienne_position = [tuple(cellule) for cellule in agent.position]
+        ancienne_position_set = set(ancienne_position)
+        nouvelle_position = [
+            (ligne + dy, colonne + dx)
+            for ligne, colonne in ancienne_position
+        ]
+        nouvelle_position_set = set(nouvelle_position)
 
+        if any(
+            ligne < 0 or ligne >= grille.shape[0]
+            or colonne < 0 or colonne >= grille.shape[1]
+            for ligne, colonne in nouvelle_position
+        ):
+            raise ValueError("Le déplacement sort des limites de la grille")
 
-        for cellule in agent.position:
-            #faire avancer l'agent
-            grille[cellule[0]][cellule[1]] = 1
-            #supprimer les cellules qui doivent être supprimé
-            #grille[cellule[0]][cellule[1] - 1] = 0
+        for ligne, colonne in ancienne_position_set - nouvelle_position_set:
+            grille[ligne, colonne] = 0
+
+        for ligne, colonne in nouvelle_position_set:
+            grille[ligne, colonne] = 1
+
+        agent.position = [[ligne, colonne] for ligne, colonne in nouvelle_position]
+
 
         return grille
 

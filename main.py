@@ -67,6 +67,14 @@ if __name__ == "__main__":
                     grille = Env.grille_vide()
                 if event.key == pygame.K_RETURN:
                     grille = Env.prochaine_generation(grille)  # pas à pas
+                if event.key == pygame.K_UP:
+                    grille = Env.prochaine_generation(grille, dx = 0, dy = -1)
+                if event.key == pygame.K_DOWN:
+                    grille = Env.prochaine_generation(grille, dx = 0, dy = 1)
+                if event.key == pygame.K_LEFT:
+                    grille = Env.prochaine_generation(grille, dx = -1, dy = 0)
+                if event.key == pygame.K_RIGHT:
+                    grille = Env.prochaine_generation(grille, dx = 1, dy = 0)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # clic gauche
