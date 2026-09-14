@@ -217,6 +217,8 @@ class Environnement(object):
 
         ancienne_position = [tuple(cellule) for cellule in agent.position]
         ancienne_position_set = set(ancienne_position)
+
+
         nouvelle_position = [
             (ligne + dy, colonne + dx)
             for ligne, colonne in ancienne_position
@@ -228,7 +230,7 @@ class Environnement(object):
             or colonne < 0 or colonne >= self.grille.shape[1]
             for ligne, colonne in nouvelle_position
         ):
-            raise ValueError("Le déplacement sort des limites de la grille")
+            return
 
         for ligne, colonne in ancienne_position_set - nouvelle_position_set:
             self.grille[ligne, colonne] = 0
