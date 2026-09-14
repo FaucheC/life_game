@@ -2,7 +2,7 @@ import numpy as np
 import random
 from collections import deque
 from AI_agent.agent import Agent
-from functions.compter_agent import extraire_agents_potentiels
+#from functions.compter_agent import extraire_agents_potentiels
 
 class Environnement(object):
     """
@@ -10,8 +10,9 @@ class Environnement(object):
 
     """
 
-    def __init__(self, largeur = 900, hauteur = 600, taille_cellule = 5):
+    def __init__(self, grille, largeur = 900, hauteur = 600, taille_cellule = 5):
 
+        self.grille = grille
         self.largeur, self.hauteur = largeur, hauteur
         self.colonnes = self.largeur // taille_cellule
         self.lignes = self.hauteur // taille_cellule
@@ -19,7 +20,7 @@ class Environnement(object):
         self.nbr_agent = []
 
 
-    def compter_voisins(self, grille, x, y):
+    def compter_voisins(self, x, y):
         """
         Compte le nombre de voisins vivants d'une cellule donnée.
 
@@ -47,12 +48,12 @@ class Environnement(object):
                     continue  # ignorer la cellule elle-même
                 ligne = (x + i) % self.lignes  # bord toroïdal en lignes
                 colonne = (y + j) % self.colonnes  # bord toroïdal en colonnes
-                somme += grille[ligne][colonne]
+                somme += self.grille[ligne][colonne]
         return somme
 
     
 
-    def prochaine_generation(self, grille, dx, dy):
+    def prochaine_generation(self, dx = 0, dy = 0):
         """
         Calcule la génération suivante selon les règles de Conway,
         puis élimine les amas de cellules vivantes de moins de 5 cellules.
@@ -87,10 +88,10 @@ class Environnement(object):
         #                nouvelle[i][j] = 1
 
         # 2. Identifier les amas de 5 cellules ou plus dans la nouvelle grille
-        resultat = extraire_agents_potentiels(grille, taille_min=5, connectivite=8)
+        resultat = self.extraire_agents_potentiels(taille_min=5, connectivite=8)
 
         agent = Agent(resultat["agents"][0]["cellules"], 0, 0)
-        grille = self.moove(grille, agent, dx, dy)
+        self.moove(agent, dx, dy)
 
         # 3. Construire une grille ne contenant que les cellules des amas survivants
         #grille_finale = np.zeros_like(grille)
@@ -100,74 +101,115 @@ class Environnement(object):
 
         #return grille_finale
 
-        return grille
-    
+        return self.grille
 
 
-    def grille_aleatoire(self, probabilite_vivante=0.2):
+######################################################################################
+
+    def extraire_agents_potentiels(self, taille_min=5, connectivite=8):
         """
-        Génère une grille de cellules aléatoires.
+        Identifie les agents potentiels dans une grille du Jeu de la Vie modifié.
 
-        Parameters:
-        -----------
-        probabilite_vivante : float, optionnel (par défaut 0.2)
-            Probabilité qu'une cellule soit vivante (1) au départ.
+        Un agent potentiel est une composante connexe de cellules vivantes (valeur 1)
+        dont la taille est supérieure ou égale à `taille_min`.
 
-        Returns:
-        --------
-        numpy.ndarray
-            Une grille de dimensions (LIGNES, COLONNES) avec des 0 (mort) et des 1 (vivant).
+        Paramètres
+        ----------
+        grille : np.ndarray ou liste de listes
+            Grille 2D binaire (1 = cellule vivante, 0 = cellule morte).
+        taille_min : int, défaut 5
+            Nombre minimum de cellules pour former un agent.
+        connectivite : int, défaut 8
+            4 pour une connexion orthogonale (haut/bas/gauche/droite).
+            8 pour une connexion incluant les diagonales.
+
+        Retour
+        ------
+        dict
+            {
+                "nombre_agents": int,
+                "agents": [
+                    {
+                        "cellules": [(i, j), ...],
+                        "taille": int,
+                        "centre": (float, float),   # centre de masse (ligne, colonne)
+                        "bbox": (min_i, max_i, min_j, max_j)
+                    },
+                    ...
+                ]
+            }
         """
-        #création de la gris aléatoire
-        random_grid = np.random.choice([0, 1], size=(self.lignes, self.colonnes), p=[1 - probabilite_vivante, probabilite_vivante])
+        #grille = np.asarray(grille)
 
-        #ajout de la nourriture   (self.colonnes * self.lignes) - 1 x,y colonne ligne
-        for n in range(1, 10):
-            x,y = random.randint(1, self.colonnes-1), random.randint(1, self.lignes-1)
-            random_grid[y][x] = 2
+        if self.grille.ndim != 2:
+            raise ValueError("La grille doit être 2D.")
 
-        return random_grid
+        n_lignes, n_colonnes = self.grille.shape
+        visite = np.zeros_like(self.grille, dtype=bool)
 
-    def grille_vide(self):
-        """
-        Crée une grille entièrement composée de cellules mortes.
+        if connectivite == 8:
+            voisins = [(-1, -1), (-1, 0), (-1, 1),
+                       (0, -1),           (0, 1),
+                       (1, -1),  (1, 0),  (1, 1)]
+        elif connectivite == 4:
+            voisins = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        else:
+            raise ValueError("connectivite doit être 4 ou 8.")
 
-        Returns:
-        --------
-        numpy.ndarray
-            Une grille de dimensions (LIGNES, COLONNES) remplie de 0.
-        """
-        return np.zeros((self.lignes, self.colonnes), dtype=int)
+        agents = []
 
+        for i in range(n_lignes):
+            for j in range(n_colonnes):
+                if self.grille[i, j] == 1 and not visite[i, j]:
+                    # BFS pour trouver toute la composante connexe
+                    composante = []
+                    file = deque()
+                    file.append((i, j))
+                    visite[i, j] = True
 
-    def save_state(self, grille, path = "C:/A_Personnel/life_game/utils/grille.npy"):
-        """
-        Cette fonction sers à sauvegarder l'état de la grille du life game
-        """
-        np.save(path, grille)
+                    while file:
+                        ci, cj = file.popleft()
+                        composante.append([ci, cj])
 
+                        for di, dj in voisins:
+                            ni, nj = ci + di, cj + dj
+                            if 0 <= ni < n_lignes and 0 <= nj < n_colonnes:
+                                if self.grille[ni, nj] == 1 and not visite[ni, nj]:
+                                    visite[ni, nj] = True
+                                    file.append((ni, nj))
 
-    def load_state(self, path = "C:/A_Personnel/life_game/utils/grille.npy"):
-        """
-        Cette fonction permet de charger l'état d'une grille précédente
-        """
-        grille = np.load(path)
+                    if len(composante) >= taille_min:
+                        lignes = [c[0] for c in composante]
+                        colonnes = [c[1] for c in composante]
+                        centre = (sum(lignes) / len(composante),
+                                  sum(colonnes) / len(composante))
+                        bbox = (min(lignes), max(lignes), min(colonnes), max(colonnes))
+                        agents.append({
+                            "cellules": composante,
+                            "taille": len(composante),
+                            "centre": centre,
+                            "bbox": bbox
+                        })
 
-        return grille
+        return {
+            "nombre_agents": len(agents),
+            "agents": agents
+        }
+
 
     def create_agent(self):
         """
         fonction servant à créer les agents si l'assemblage de cellule le permet
         """
 
-    ########## Partie de l'environnement spécifique aux actions de l'agent
+    ########## Partie de l'environnement spécifique aux actions de l'agent #########################################
 
     def get_observation(self):
         """
         Vision de l'agent
         """
 
-    def moove(self, grille, agent, dx = 1, dy = 1):
+    def moove(self, agent, dx = 1, dy = 1):
         """
         Déplace l'agent
         """
@@ -182,22 +224,21 @@ class Environnement(object):
         nouvelle_position_set = set(nouvelle_position)
 
         if any(
-            ligne < 0 or ligne >= grille.shape[0]
-            or colonne < 0 or colonne >= grille.shape[1]
+            ligne < 0 or ligne >= self.grille.shape[0]
+            or colonne < 0 or colonne >= self.grille.shape[1]
             for ligne, colonne in nouvelle_position
         ):
             raise ValueError("Le déplacement sort des limites de la grille")
 
         for ligne, colonne in ancienne_position_set - nouvelle_position_set:
-            grille[ligne, colonne] = 0
+            self.grille[ligne, colonne] = 0
 
         for ligne, colonne in nouvelle_position_set:
-            grille[ligne, colonne] = 1
+            self.grille[ligne, colonne] = 1
 
         agent.position = [[ligne, colonne] for ligne, colonne in nouvelle_position]
 
-
-        return grille
+        #return grille
 
 
 
