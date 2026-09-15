@@ -290,6 +290,7 @@ class Environnement(object):
         l'agent attaque unn autre agent pour essayer d'obtenir de la nourriture
         """
 
+
     def reproduce(self, agent):
         """
         l'agent se reproduit si son niveau d'énergie le lui permet
@@ -303,6 +304,44 @@ class Environnement(object):
         l'agent mange de la nourriture
         """
         agent.energie = agent.energie + 3
+
+    def step(self, action):
+        """
+        fonction de pilotage
+
+        Args:
+            action : dict
+        """
+
+        if action == 0:
+            # déplacement vers le haut
+            self.moove(self.agent, 0, -1)
+        if action == 1:
+            # déplacement vers le bas
+            self.moove(self.agent, 0, 1)
+        if action == 2:
+            # déplacement vers la gauche
+            self.moove(self.agent, -1, 0)
+        if action == 3:
+            # déplacement vers la droite
+            self.moove(self.agent, 1, 0)
+        if action == 4:
+            # manger
+            self.eat(self.agent)
+
+
+        reward = self.compute_reward(self.agent, action["action_id"], True)
+
+
+    def update_agent(self, agent: Agent):
+        """
+        mise à jour de l'âge et du niveau d'energie de l'agent
+        """
+        # mise à jour de l'age de l'agent
+        agent.age = agent.age + 1
+        # mise à jour du niveau d'énergie
+        agent.energie = agent.energie - 0.05
+
 
 #TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)
 #charger une map vide avec un seul agent et une nourriture
