@@ -20,6 +20,11 @@ class Environnement(object):
         self.nbr_agent = []
 
 
+        #initialisation de notre agent unique
+        resultat = self.extraire_agents_potentiels(taille_min=5, connectivite=8)
+        self.agent = Agent(resultat["agents"][0]["cellules"], 0, 3)
+
+
     def compter_voisins(self, x, y):
         """
         Compte le nombre de voisins vivants d'une cellule donnée.
@@ -88,10 +93,15 @@ class Environnement(object):
         #                nouvelle[i][j] = 1
 
         # 2. Identifier les amas de 5 cellules ou plus dans la nouvelle grille
-        resultat = self.extraire_agents_potentiels(taille_min=5, connectivite=8)
+        #resultat = self.extraire_agents_potentiels(taille_min=5, connectivite=8)
 
-        agent = Agent(resultat["agents"][0]["cellules"], 0, 0)
-        self.moove(agent, dx, dy)
+        #agent = Agent(resultat["agents"][0]["cellules"], 0, 3)
+        self.moove(self.agent, dx, dy)
+
+        #on augmente l'age de l'agent de 1
+        self.agent.age = self.agent.age + 1
+        #on diminue l'énergie rien que pour la survie
+        self.agent.energie =  self.agent.energie - 0.05
 
         # 3. Construire une grille ne contenant que les cellules des amas survivants
         #grille_finale = np.zeros_like(grille)
@@ -204,41 +214,72 @@ class Environnement(object):
 
     ########## Partie de l'environnement spécifique aux actions de l'agent #########################################
 
+    def compute_reward(self, agent: Agent, action_id, sucess):
+        """
+        Calcul les récompenses de l'agent selon l'action prise
+        """
+        reward = 0
+
+        #survivre
+        reward += 0.1
+
+
+        #récompense selon l'action
+        if sucess:
+            if action_id == 2:      #manger
+                reward = reward + 1
+            if action_id == 3:
+                reward = reward + 0.5
+
+        #pénalité si l'agent est mort
+        if agent.energie <= 0:
+            reward = reward - 10
+
+
+        return reward
+        
+
     def get_observation(self):
         """
         Vision de l'agent
         """
 
-    def moove(self, agent, dx = 1, dy = 1):
+    def moove(self, agent : Agent, dx = 1, dy = 1):
         """
         Déplace l'agent
         """
-        #TODO: mettre des conditions si la valeurs de x ou y sors de la grille
+        if agent.energie >= 0.5:
 
-        ancienne_position = [tuple(cellule) for cellule in agent.position]
-        ancienne_position_set = set(ancienne_position)
+            ancienne_position = [tuple(cellule) for cellule in agent.position]
+            ancienne_position_set = set(ancienne_position)
 
 
-        nouvelle_position = [
-            (ligne + dy, colonne + dx)
-            for ligne, colonne in ancienne_position
-        ]
-        nouvelle_position_set = set(nouvelle_position)
+            nouvelle_position = [
+                (ligne + dy, colonne + dx)
+                for ligne, colonne in ancienne_position
+            ]
+            nouvelle_position_set = set(nouvelle_position)
 
-        if any(
-            ligne < 0 or ligne >= self.grille.shape[0]
-            or colonne < 0 or colonne >= self.grille.shape[1]
-            for ligne, colonne in nouvelle_position
-        ):
-            return
+            if any(
+                ligne < 0 or ligne >= self.grille.shape[0]
+                or colonne < 0 or colonne >= self.grille.shape[1]
+                for ligne, colonne in nouvelle_position
+            ):
+                return
 
-        for ligne, colonne in ancienne_position_set - nouvelle_position_set:
-            self.grille[ligne, colonne] = 0
+            for ligne, colonne in ancienne_position_set - nouvelle_position_set:
+                self.grille[ligne, colonne] = 0
 
-        for ligne, colonne in nouvelle_position_set:
-            self.grille[ligne, colonne] = 1
+            for ligne, colonne in nouvelle_position_set:
+                self.grille[ligne, colonne] = 1
 
-        agent.position = [[ligne, colonne] for ligne, colonne in nouvelle_position]
+            agent.position = [[ligne, colonne] for ligne, colonne in nouvelle_position]
+
+            #baisse d'énergie du au déplacement
+            agent.energie = agent.energie - 0.5
+
+        else:
+            raise ValueError("Energy too low")
 
         #return grille
 
@@ -257,6 +298,11 @@ class Environnement(object):
         if agent.energie > 1000000:
             pass
 
+    def eat(self, agent: Agent):
+        """
+        l'agent mange de la nourriture
+        """
+        agent.energie = agent.energie + 3
 
 #TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)
 #charger une map vide avec un seul agent et une nourriture
