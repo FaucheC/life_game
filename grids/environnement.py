@@ -19,7 +19,7 @@ class Environnement(object):
         self.lignes = self.hauteur // taille_cellule
         self.taille_cellule = taille_cellule
         self.nbr_agent = []
-        self.eloignement = 0
+        self.best_distance = np.array([10,10])
 
 
         #initialisation de notre agent unique
@@ -228,10 +228,26 @@ class Environnement(object):
 
         #récompense selon l'action
         if sucess:
-            if action_id == 2:      #manger
-                reward = reward + 1
-            if action_id == 3:
-                reward = reward + 0.5
+            if action_id == 0: # and np.sum(self.calcul_distance()) < np.sum(self.best_distance):
+                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
+                    reward = reward + 0.5
+                else:
+                    reward = reward - 0.5
+            elif action_id == 1:      #manger
+                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
+                    reward = reward + 0.5
+                else:
+                    reward = reward - 0.5
+            elif action_id == 2:
+                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
+                    reward = reward + 0.5
+                else:
+                    reward = reward - 0.5
+            elif action_id == 3:
+                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
+                    reward = reward + 0.5
+                else:
+                    reward = reward - 0.5
 
         #pénalité si l'agent est mort
         if agent.energie <= 0:
@@ -286,8 +302,6 @@ class Environnement(object):
 
 
         print("-------------")
-        #self.eloignement = np.abs(self.find_food()[0] - agent.position[0])
-        #print(self.eloignement)
         print(self.calcul_distance(agent))
 
         #return grille
@@ -357,15 +371,21 @@ class Environnement(object):
         fonction permettant de calculer la distance 
         """
         best_cell = np.array([100,100])
+        food_position = self.find_food()[0]
 
         for cell in agent.position:
             # on cherche la cellule la plus proche de la nourriture
 
-            #if np.abs(cell - self.find_food()[0]) < np.abs(best_cell - self.find_food()[0]):
-            if np.abs(np.sum(cell) - np.sum(self.find_food()[0])) < np.abs(np.sum(best_cell) - np.sum(self.find_food()[0])):
+
+            #iitere dans la liste de cellules représentant la position de l'agent
+            if np.sum(np.abs(cell - food_position)) < np.sum(np.abs(best_cell - food_position)):
                 best_cell = cell
 
-        return best_cell
+            
+        #distance de la cible
+        distance = np.array([np.abs(best_cell[0] - food_position[0]), np.abs(best_cell[1] - food_position[1])])
+
+        return distance
 
 
 
