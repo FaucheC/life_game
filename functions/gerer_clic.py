@@ -15,8 +15,14 @@ def gerer_clic(souris_x, souris_y, TAILLE_CELLULE, LIGNES, COLONNES, grille, cli
     ligne = souris_y // TAILLE_CELLULE
     if clic == "gauche":
         if 0 <= ligne < LIGNES and 0 <= col < COLONNES:
-            grille[ligne][col] = 1 - grille[ligne][col]  # inverse (0 ↔ 1)
+            if grille[ligne][col] == 0:
+                grille[ligne][col] = 1
+            elif grille[ligne][col] == 1:
+                grille[ligne][col] = 0
+            elif grille[ligne][col] == 2:
+                grille[ligne][col] = 0
 
+                
     elif clic == "droit":
         if 0 <= ligne < LIGNES and 0 <= col < COLONNES:
             grille[ligne][col] = 2  

@@ -14,8 +14,8 @@ from grids.environnement import Environnement
 
 if __name__ == "__main__":
     # --- Constantes de l'affichage ---
-    LARGEUR, HAUTEUR = 900, 600
-    TAILLE_CELLULE = 25
+    LARGEUR, HAUTEUR = 800, 800
+    TAILLE_CELLULE = 100
     COLONNES = LARGEUR // TAILLE_CELLULE
     LIGNES = HAUTEUR // TAILLE_CELLULE
 
@@ -41,11 +41,11 @@ if __name__ == "__main__":
     # --- Configuration initiale ---
     if load is True:
         grille = load_state(path = "C:/A_Personnel/life_game/utils/grille.npy")
-        Env = Environnement(grille, largeur = 900, hauteur = 600, taille_cellule = 25)
+        Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100)
 
     else:
         grille = grille_aleatoire(LIGNES, COLONNES, 0.2)
-        Env = Environnement(grille, largeur = 900, hauteur = 600, taille_cellule = 25)
+        Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100)
 
 
     # --- Boucle principale ---
@@ -82,11 +82,11 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # clic gauche
                     souris_x, souris_y = pygame.mouse.get_pos()
-                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, grille, clic="gauche")
+                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, Env.grille, clic="gauche")
 
                 if event.button == 3:  #clic droit
                     souris_x, souris_y = pygame.mouse.get_pos()
-                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, grille, clic="droit")
+                    gerer_clic(souris_x, souris_y, Env.taille_cellule, Env.lignes, Env.colonnes, Env.grille, clic="droit")
 
         # --- Mise à jour de la simulation ---
         if not pause:

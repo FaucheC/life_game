@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import torch
 from collections import deque
 from AI_agent.agent import Agent
 #from functions.compter_agent import extraire_agents_potentiels
@@ -21,8 +22,9 @@ class Environnement(object):
 
 
         #initialisation de notre agent unique
-        resultat = self.extraire_agents_potentiels(taille_min=5, connectivite=8)
-        self.agent = Agent(resultat["agents"][0]["cellules"], 0, 3)
+        resultat = self.extraire_agents_potentiels(taille_min=2, connectivite=8)
+        print(resultat)
+        self.agent = Agent(resultat["agents"][0]["cellules"], 0, 10)
 
 
     def compter_voisins(self, x, y):
@@ -239,10 +241,11 @@ class Environnement(object):
         return reward
         
 
-    def get_observation(self):
+    def get_observation(self, agent, grille):
         """
         Vision de l'agent
         """
+
 
     def moove(self, agent : Agent, dx = 1, dy = 1):
         """
@@ -280,6 +283,7 @@ class Environnement(object):
 
         else:
             raise ValueError("Energy too low")
+
 
         #return grille
 
@@ -341,6 +345,17 @@ class Environnement(object):
         agent.age = agent.age + 1
         # mise à jour du niveau d'énergie
         agent.energie = agent.energie - 0.05
+
+    def calcul_distance(self, agent):
+        """
+        fonction permettant de calculer la distance 
+        """
+
+    def find_food(self):
+        """
+        fonction pour obtenir la position de la nourriture
+        """
+        index = np.where(self.grille == 2)
 
 
 #TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)
