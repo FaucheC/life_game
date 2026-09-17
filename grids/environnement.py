@@ -286,8 +286,9 @@ class Environnement(object):
 
 
         print("-------------")
-        self.eloignement = np.abs(self.find_food()[0] - agent.position[0])
-        print(self.eloignement)
+        #self.eloignement = np.abs(self.find_food()[0] - agent.position[0])
+        #print(self.eloignement)
+        print(self.calcul_distance(agent))
 
         #return grille
 
@@ -350,10 +351,23 @@ class Environnement(object):
         # mise à jour du niveau d'énergie
         agent.energie = agent.energie - 0.05
 
+
     def calcul_distance(self, agent):
         """
         fonction permettant de calculer la distance 
         """
+        best_cell = np.array([100,100])
+
+        for cell in agent.position:
+            # on cherche la cellule la plus proche de la nourriture
+
+            #if np.abs(cell - self.find_food()[0]) < np.abs(best_cell - self.find_food()[0]):
+            if np.abs(np.sum(cell) - np.sum(self.find_food()[0])) < np.abs(np.sum(best_cell) - np.sum(self.find_food()[0])):
+                best_cell = cell
+
+        return best_cell
+
+
 
     def find_food(self):
         """
