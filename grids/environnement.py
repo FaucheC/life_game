@@ -19,11 +19,11 @@ class Environnement(object):
         self.lignes = self.hauteur // taille_cellule
         self.taille_cellule = taille_cellule
         self.nbr_agent = []
+        self.eloignement = 0
 
 
         #initialisation de notre agent unique
         resultat = self.extraire_agents_potentiels(taille_min=2, connectivite=8)
-        print(resultat)
         self.agent = Agent(resultat["agents"][0]["cellules"], 0, 10)
 
 
@@ -285,6 +285,10 @@ class Environnement(object):
             raise ValueError("Energy too low")
 
 
+        print("-------------")
+        self.eloignement = np.abs(self.find_food()[0] - agent.position[0])
+        print(self.eloignement)
+
         #return grille
 
 
@@ -355,8 +359,10 @@ class Environnement(object):
         """
         fonction pour obtenir la position de la nourriture
         """
-        index = np.where(self.grille == 2)
+        index = np.argwhere(self.grille == 2)
+
+        return index
 
 
-#TODO: modifier grille pour en faire un attribut global de la classe (1000 fois plus cohérent)
-#charger une map vide avec un seul agent et une nourriture
+#TODO: calculer la distance, faire avncer l'agent avec la cellule la plus proche de la nourriture, ajuster la fonction step
+#si l'agent s'est rapproché avec la fonction -> récompense légèrement positive, sinon récompense négative
