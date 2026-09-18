@@ -326,7 +326,7 @@ class Environnement(object):
         """
         l'agent mange de la nourriture
         """
-        agent.energie = agent.energie + 3
+        agent.energie = agent.energie + 10
 
     def step(self, action):
         """

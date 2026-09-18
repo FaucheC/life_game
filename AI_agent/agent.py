@@ -1,4 +1,6 @@
 from AI_agent.q_network import QNetwork
+import random
+import torch
 
 
 class Agent(object):
@@ -13,10 +15,25 @@ class Agent(object):
         self.energie = energie
 
 
-    def choose_action(self, observation):
+    def choose_action(self, grille, epsilon):
         """
         Cette fonction choisit l'action a effectuer à partir du réseau de neurones
         """
+        if random.random() < epsilon:
+            #exploration (action aléatoire)
+            return random.randrange(0, 4, 1)
+
+        else:
+            #TODO: ajouter la partie pour additionner le tableau de la grille et le niveau d'énergie et la position
+            # + ajouuter la possibilité de charger le modèle également
+            with torch.no_grad():
+                state_t = torch.tensor(grille, dtype=torch.float32).unsqueeze(0)
+                q_values = self.q_network(state_t)
+                return q_values.argmax().item()
+            
+
+        
+
 
     def update(self):
         """
