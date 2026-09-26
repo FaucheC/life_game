@@ -307,6 +307,9 @@ class Environnement(object):
         if self.calcul_distance(agent) is True:
             print("eating")
             self.eat(agent)
+            print(agent.energie)
+
+        print(agent.position)
 
         #return grille
 
