@@ -40,19 +40,22 @@ def grille_aleatoire(lignes, colonnes, probabilite_vivante=0.2):
     lignes = lignes - 1
     colonnes = colonnes - 1
 
-    food_position = (random.randint(0, lignes), random.randint(0, lignes))
+    #placement des cellules de l'agent sur le
     cell_position = (random.randint(1, lignes-1), random.randint(1, colonnes-1))
-
-    #placement de la nourriture
-    grille[food_position[0]][food_position[1]] = 2
-
-    #placement de l'agent
-    agent_position = [(cell_position[0], cell_position[1]-1), (cell_position[0], cell_position[1]), (cell_position[0], cell_position[1]+1)]
     grille[cell_position[0]][cell_position[1]-1] = 1
     grille[cell_position[0]][cell_position[1]] = 1
     grille[cell_position[0]][cell_position[1]+1] = 1
 
-    if food_position not in agent_position:
-        return grille
-    else:
-        grille_aleatoire(lignes, colonnes, probabilite_vivante=0.2)
+    agent_position = [(cell_position[0], cell_position[1]-1), (cell_position[0], cell_position[1]), (cell_position[0], cell_position[1]+1)]
+
+
+    #gestion du placement de la nourriture
+    food_position = (random.randint(0, lignes), random.randint(0, lignes))
+
+    while food_position in agent_position:
+        food_position = (random.randint(0, lignes), random.randint(0, lignes))
+    grille[food_position[0]][food_position[1]] = 2
+
+    return grille
+    
+
