@@ -304,8 +304,9 @@ class Environnement(object):
             raise ValueError("Energy too low")
 
 
-        print("-------------")
-        print(self.calcul_distance(agent))
+        if self.calcul_distance(agent) is True:
+            print("eating")
+            self.eat(agent)
 
         #return grille
 
@@ -373,22 +374,27 @@ class Environnement(object):
         """
         fonction permettant de calculer la distance 
         """
-        best_cell = np.array([100,100])
-        food_position = self.find_food()[0]
+        if len(self.find_food()) > 0:
+            best_cell = np.array([100,100])
+            food_position = self.find_food()[0]
 
-        for cell in agent.position:
-            # on cherche la cellule la plus proche de la nourriture
+            for cell in agent.position:
+                # on cherche la cellule la plus proche de la nourriture
 
 
-            #iitere dans la liste de cellules représentant la position de l'agent
-            if np.sum(np.abs(cell - food_position)) < np.sum(np.abs(best_cell - food_position)):
-                best_cell = cell
+                #iitere dans la liste de cellules représentant la position de l'agent
+                if np.sum(np.abs(cell - food_position)) < np.sum(np.abs(best_cell - food_position)):
+                    best_cell = cell
 
-            
-        #distance de la cible
-        distance = np.array([np.abs(best_cell[0] - food_position[0]), np.abs(best_cell[1] - food_position[1])])
 
-        return distance
+            #distance de la cible
+            distance = np.array([np.abs(best_cell[0] - food_position[0]), np.abs(best_cell[1] - food_position[1])])
+
+            return distance
+
+        else:
+            #si la liste distance est vide, on lance l'action manger !!!!!
+            return True
 
 
 
@@ -402,4 +408,3 @@ class Environnement(object):
 
 
 #TODO: faire en sorte que lorsqu'une des cellules est arrivé à la position de la nourriture ça appelle la fonction manger + updater get-reward
-#TODO: changer la fonction random grid pour une grille avec 1 agent une nourriture placer de manière totalement random
