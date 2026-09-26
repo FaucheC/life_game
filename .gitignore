@@ -1,2 +1,3 @@
 venv/
-*scratch
+*.txt
+scratch.py

@@ -233,7 +233,7 @@ class Environnement(object):
                     reward = reward + 0.5
                 else:
                     reward = reward - 0.5
-            elif action_id == 1:      #manger
+            elif action_id == 1:      
                 if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
                     reward = reward + 0.5
                 else:
@@ -248,6 +248,9 @@ class Environnement(object):
                     reward = reward + 0.5
                 else:
                     reward = reward - 0.5
+
+        #manger #########################
+
 
         #pénalité si l'agent est mort
         if agent.energie <= 0:
@@ -398,5 +401,5 @@ class Environnement(object):
         return index
 
 
-#TODO: calculer la distance, faire avncer l'agent avec la cellule la plus proche de la nourriture, ajuster la fonction step
-#si l'agent s'est rapproché avec la fonction -> récompense légèrement positive, sinon récompense négative
+#TODO: faire en sorte que lorsqu'une des cellules est arrivé à la position de la nourriture ça appelle la fonction manger + updater get-reward
+#TODO: changer la fonction random grid pour une grille avec 1 agent une nourriture placer de manière totalement random

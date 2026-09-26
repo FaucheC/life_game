@@ -34,7 +34,7 @@ if __name__ == "__main__":
     horloge = pygame.time.Clock()
 
 
-    load = True
+    load = False
     pause = True  # La simulation est en pause par défaut
     running = True
 
