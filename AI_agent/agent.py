@@ -88,8 +88,22 @@ class Agent(object):
 
         return loss.item()
 
-    def action(self):
+    def action(self, environnement, grille: np.ndarray, epsilon: float = 0.0):
         """
-        Cette fonction permet d'envoyer l'action choisit à l'environnement pour obtenir les conséquences 
+        Choisit une action, l'envoie à l'environnement et retourne sa récompense.
+
+        L'action est un entier entre 0 et 3 : haut, bas, gauche ou droite.
+
+        Args:
+            environnement: Environnement qui applique l'action de l'agent.
+            grille: Grille courante utilisée pour choisir l'action.
+            epsilon: Probabilité de choisir une action aléatoire.
+
+        Returns:
+            Un tuple contenant l'identifiant de l'action et la récompense obtenue.
         """
+        # Choisit une direction, puis laisse l'environnement appliquer son effet.
+        action_id = self.choose_action(grille, epsilon)
+        reward = environnement.step(action_id)
         
+        return action_id, reward

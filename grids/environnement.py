@@ -337,30 +337,29 @@ class Environnement(object):
 
     def step(self, action):
         """
-        fonction de pilotage
+        Applique une action de déplacement et retourne la récompense obtenue.
 
         Args:
-            action : dict
+            action: Identifiant de direction (0: haut, 1: bas, 2: gauche, 3: droite).
         """
 
         if action == 0:
             # déplacement vers le haut
             self.moove(self.agent, 0, -1)
-        if action == 1:
+        elif action == 1:
             # déplacement vers le bas
             self.moove(self.agent, 0, 1)
-        if action == 2:
+        elif action == 2:
             # déplacement vers la gauche
             self.moove(self.agent, -1, 0)
-        if action == 3:
+        elif action == 3:
             # déplacement vers la droite
             self.moove(self.agent, 1, 0)
-        if action == 4:
-            # manger
-            self.eat(self.agent)
+        else:
+            raise ValueError("L'action doit être un entier entre 0 et 3.")
 
-
-        reward = self.compute_reward(self.agent, action["action_id"], True)
+        reward = self.compute_reward(self.agent, action, True)
+        return reward
 
 
     def update_agent(self, agent: Agent):
