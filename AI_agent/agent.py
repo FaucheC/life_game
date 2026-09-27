@@ -1,4 +1,5 @@
 from AI_agent.q_network import QNetwork
+from AI_agent.replay_buffer import ReplayBuffer
 import random
 import torch
 import numpy as np
@@ -17,6 +18,7 @@ class Agent(object):
 
         #création du cerveau
         self.brain = QNetwork(71, 4)
+        self.optimizer = torch.optim.Adam(self.brain.parameters(), lr=1e-3)
 
     def build_state_tensor(self, grille: np.ndarray) -> torch.Tensor:
         """Construit l'état du réseau à partir de la grille, de la position et de l'énergie.
@@ -40,22 +42,51 @@ class Agent(object):
             return random.randrange(0, 4, 1)
 
         else:
-            #TODO: ajouter la partie pour additionner le tableau de la grille et le niveau d'énergie et la position
             # + ajouuter la possibilité de charger le modèle également
             with torch.no_grad():
                 state_t = self.build_state_tensor(grille)
                 q_values = self.brain(state_t)
-                #TODO: modifier le return, je suis presque sur que ça ne marche pas (il suffit juste de récupérer l'action ayant la valeur maximale)
-                return q_values.argmax().item()
+                return q_values.argmax(dim=1).item()
             
 
         
 
 
-    def update(self):
+    def update(self, replay_buffer: ReplayBuffer, batch_size: int = 64, gamma: float = 0.99):
         """
-        This function update the Deep Q-Network of the agent
+        Met à jour le Q-network à partir d'un batch de transitions mémorisées.
+
+        Les états stockés dans le buffer doivent être ceux produits par
+        `build_state_tensor`, convertis en tableaux de forme (71,) ou (1, 71).
+        Retourne la perte d'apprentissage, ou None si le buffer est trop petit.
         """
+        # L'apprentissage attend un batch complet d'expériences.
+        if len(replay_buffer) < batch_size:
+            return None
+
+        # Échantillonne les transitions puis convertit leurs valeurs en tenseurs.
+        states, actions, rewards, next_states, dones = replay_buffer.sample(batch_size)
+        states = torch.as_tensor(states, dtype=torch.float32).reshape(batch_size, -1)
+        actions = torch.as_tensor(actions, dtype=torch.int64).reshape(batch_size, 1)
+        rewards = torch.as_tensor(rewards, dtype=torch.float32).reshape(batch_size)
+        next_states = torch.as_tensor(next_states, dtype=torch.float32).reshape(batch_size, -1)
+        dones = torch.as_tensor(dones, dtype=torch.float32).reshape(batch_size)
+
+        # Récupère Q(s, a) pour l'action réellement effectuée dans chaque état.
+        current_q_values = self.brain(states).gather(1, actions).squeeze(1)
+
+        # Calcule la cible de Bellman; un état terminal n'a pas de récompense future.
+        with torch.no_grad():
+            next_q_values = self.brain(next_states).max(dim=1).values
+            target_q_values = rewards + gamma * next_q_values * (1 - dones)
+
+        # Réduit l'écart entre Q(s, a) prédit et sa cible, puis met à jour le réseau.
+        loss = torch.nn.functional.smooth_l1_loss(current_q_values, target_q_values)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        return loss.item()
 
     def action(self):
         """

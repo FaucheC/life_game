@@ -309,7 +309,7 @@ class Environnement(object):
             self.eat(agent)
             print(agent.energie)
 
-        print(agent.position)
+        #print(agent.position)
 
         #return grille
 
@@ -410,4 +410,3 @@ class Environnement(object):
         return index
 
 
-#TODO: faire en sorte que lorsqu'une des cellules est arrivé à la position de la nourriture ça appelle la fonction manger + updater get-reward
