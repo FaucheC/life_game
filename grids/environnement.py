@@ -226,28 +226,13 @@ class Environnement(object):
         reward += 0.1
 
 
-        #récompense selon l'action
-        if sucess:
-            if action_id == 0: # and np.sum(self.calcul_distance()) < np.sum(self.best_distance):
-                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
-                    reward = reward + 0.5
-                else:
-                    reward = reward - 0.5
-            elif action_id == 1:      
-                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
-                    reward = reward + 0.5
-                else:
-                    reward = reward - 0.5
-            elif action_id == 2:
-                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
-                    reward = reward + 0.5
-                else:
-                    reward = reward - 0.5
-            elif action_id == 3:
-                if np.sum(self.calcul_distance()) < np.sum(self.best_distance):
-                    reward = reward + 0.5
-                else:
-                    reward = reward - 0.5
+        # Le bonus de déplacement ne s'applique que si une nourriture existe.
+        distance = self.calcul_distance(agent)
+        if sucess and action_id in range(4) and distance is not None:
+            if np.sum(distance) < np.sum(self.best_distance):
+                reward += 0.5
+            else:
+                reward -= 0.5
 
         #manger #########################
 
@@ -289,6 +274,10 @@ class Environnement(object):
             ):
                 return
 
+            # Repère la nourriture avant que les cellules de l'agent ne l'écrasent.
+            positions_nourriture = {tuple(cellule) for cellule in self.find_food()}
+            a_mange = bool(nouvelle_position_set & positions_nourriture)
+
             for ligne, colonne in ancienne_position_set - nouvelle_position_set:
                 self.grille[ligne, colonne] = 0
 
@@ -303,11 +292,8 @@ class Environnement(object):
         else:
             raise ValueError("Energy too low")
 
-
-        if self.calcul_distance(agent) is True:
-            print("eating")
+        if a_mange:
             self.eat(agent)
-            print(agent.energie)
 
         #print(agent.position)
 
@@ -359,6 +345,7 @@ class Environnement(object):
             raise ValueError("L'action doit être un entier entre 0 et 3.")
 
         reward = self.compute_reward(self.agent, action, True)
+        
         return reward
 
 
@@ -375,6 +362,8 @@ class Environnement(object):
     def calcul_distance(self, agent):
         """
         fonction permettant de calculer la distance 
+
+        Retourne None si aucune nourriture n'est présente sur la grille.
         """
         if len(self.find_food()) > 0:
             best_cell = np.array([100,100])
@@ -395,8 +384,8 @@ class Environnement(object):
             return distance
 
         else:
-            #si la liste distance est vide, on lance l'action manger !!!!!
-            return True
+            # L'absence de nourriture ne doit pas déclencher l'action manger.
+            return None
 
 
 

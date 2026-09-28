@@ -9,6 +9,7 @@ from functions.generate_grid import grille_aleatoire
 from functions.load_state import load_state
 from functions.save_state import save_state
 from grids.environnement import Environnement
+from AI_agent.replay_buffer import ReplayBuffer
 
 
 
@@ -46,6 +47,13 @@ if __name__ == "__main__":
     else:
         grille = grille_aleatoire(LIGNES, COLONNES, 0.2)
         Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100)
+
+    # Paramètres et mémoire utilisés pendant l'apprentissage.
+    replay_buffer = ReplayBuffer(capacity=10_000)
+    batch_size = 64
+    epsilon = 1.0
+    epsilon_min = 0.05
+    epsilon_decay = 0.995
 
 
     # --- Boucle principale ---
@@ -90,7 +98,25 @@ if __name__ == "__main__":
 
         # --- Mise à jour de la simulation ---
         if not pause:
-            grille = Env.prochaine_generation(dx = 0, dy = 0)
+            agent = Env.agent
+
+            # Garde l'état avant l'action, car l'environnement modifie la grille.
+            state = agent.build_state_tensor(Env.grille).squeeze(0).numpy().copy()
+            action_id, reward = agent.action(Env, Env.grille, epsilon)
+            next_state = agent.build_state_tensor(Env.grille).squeeze(0).numpy().copy()
+
+            # Une énergie insuffisante termine l'épisode; on la restaure ensuite.
+            done = agent.energie < 0.5
+            replay_buffer.push(state, action_id, reward, next_state, done)
+
+            # update attend d'avoir au moins un batch complet dans la mémoire.
+            agent.update(replay_buffer, batch_size=batch_size)
+
+            epsilon = max(epsilon_min, epsilon * epsilon_decay)
+            if done:
+                agent.energie = 10
+
+            grille = Env.grille
 
         # --- Affichage ---
         afficher_grille(Env.grille, Env.lignes, Env.colonnes, Env.taille_cellule, ecran)

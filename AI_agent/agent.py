@@ -28,7 +28,16 @@ class Agent(object):
         Le tenseur retourné est un batch float32 de forme (1, 71), prêt pour le QNetwork.
         """
         grille_tensor = torch.as_tensor(grille, dtype=torch.float32).reshape(-1)
-        position_tensor = torch.tensor(self.position, dtype=torch.float32).reshape(-1)
+        position_tensor = torch.as_tensor(self.position, dtype=torch.float32).reshape(-1)
+
+        # Le réseau attend toujours trois coordonnées (6 valeurs), même si
+        # l'agent extrait de la grille contient un nombre différent de cellules.
+        position_tensor = position_tensor[:6]
+        if position_tensor.numel() < 6:
+            position_tensor = torch.nn.functional.pad(
+                position_tensor, (0, 6 - position_tensor.numel())
+            )
+
         energie_tensor = torch.tensor([self.energie], dtype=torch.float32)
         return torch.cat((grille_tensor, position_tensor, energie_tensor)).unsqueeze(0)
 
