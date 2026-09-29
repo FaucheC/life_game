@@ -50,10 +50,10 @@ def grille_aleatoire(lignes, colonnes, probabilite_vivante=0.2):
 
 
     #gestion du placement de la nourriture
-    food_position = (random.randint(0, lignes), random.randint(0, lignes))
+    food_position = (random.randint(0, lignes), random.randint(0, colonnes))
 
     while food_position in agent_position:
-        food_position = (random.randint(0, lignes), random.randint(0, lignes))
+        food_position = (random.randint(0, lignes), random.randint(0, colonnes))
     grille[food_position[0]][food_position[1]] = 2
 
     return grille

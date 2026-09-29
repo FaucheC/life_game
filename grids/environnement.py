@@ -294,6 +294,7 @@ class Environnement(object):
 
         if a_mange:
             self.eat(agent)
+            self.add_food(agent, self.grille)
 
         #print(agent.position)
 
@@ -388,7 +389,6 @@ class Environnement(object):
             return None
 
 
-
     def find_food(self):
         """
         fonction pour obtenir la position de la nourriture
@@ -397,4 +397,23 @@ class Environnement(object):
 
         return index
 
+    def add_food(self, agent: Agent, grille):
+        """
+        function to add food when there is no food on the map
+
+        Args:
+            agent : IA agent
+            grille : numpy array
+
+        Return:
+            new_grids : numpy array avec la  nourriture associé
+
+        """
+
+        food_position = [random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1)]
+
+        while food_position in agent.position:
+            food_position = [random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1)]
+
+        grille[food_position[0]][food_position[1]] = 2
 
