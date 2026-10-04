@@ -35,18 +35,14 @@ if __name__ == "__main__":
     horloge = pygame.time.Clock()
 
 
-    load = False
+    load = True
     pause = True  # La simulation est en pause par défaut
     running = True
 
     # --- Configuration initiale ---
-    if load is True:
-        grille = load_state(path = "C:/A_Personnel/life_game/utils/grille.npy")
-        Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100)
+    grille = grille_aleatoire(LIGNES, COLONNES, 0.2)
+    Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100, load = load)
 
-    else:
-        grille = grille_aleatoire(LIGNES, COLONNES, 0.2)
-        Env = Environnement(grille, largeur = 800, hauteur = 800, taille_cellule = 100)
 
     # Paramètres et mémoire utilisés pendant l'apprentissage.
     replay_buffer = ReplayBuffer(capacity=10_000)
@@ -56,6 +52,7 @@ if __name__ == "__main__":
     epsilon_decay = 0.995
 
 
+
     # --- Boucle principale ---
     while running:
         ecran.fill(NOIR)
@@ -63,6 +60,8 @@ if __name__ == "__main__":
         # --- Gestion des événements ---
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                #sauvegarde du moodèle ici
+                Env.agent.save()
                 running = False
                 pygame.quit()
                 sys.exit()

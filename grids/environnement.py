@@ -11,7 +11,7 @@ class Environnement(object):
 
     """
 
-    def __init__(self, grille, largeur = 900, hauteur = 600, taille_cellule = 5):
+    def __init__(self, grille, largeur = 900, hauteur = 600, taille_cellule = 5, load = False):
 
         self.grille = grille
         self.largeur, self.hauteur = largeur, hauteur
@@ -24,7 +24,7 @@ class Environnement(object):
 
         #initialisation de notre agent unique
         resultat = self.extraire_agents_potentiels(taille_min=2, connectivite=8)
-        self.agent = Agent(resultat["agents"][0]["cellules"], 0, 10)
+        self.agent = Agent(resultat["agents"][0]["cellules"], 0, 10, load)
 
 
     def compter_voisins(self, x, y):

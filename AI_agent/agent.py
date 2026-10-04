@@ -10,15 +10,23 @@ class Agent(object):
     This is class create an Agent who follow rules of life game (see Readme.md)
     """
 
-    def __init__(self, position: list, age: int, energie: int):
+    def __init__(self, position: list, age: int, energie: int, load):
 
         self.position = position
         self.age = age
         self.energie = energie
 
         #création du cerveau
-        self.brain = QNetwork(71, 4)
-        self.optimizer = torch.optim.Adam(self.brain.parameters(), lr=1e-3)
+        if load is True:
+            print("xxxxxxxxxxxxxx chargement du modèle xxxxxxxxxxxxxx")
+            self.brain = QNetwork(71, 4)
+            self.brain.load_state_dict(torch.load("C:/A_Personnel/life_game/utils/brain.pth", weights_only = True))
+            self.optimizer = torch.optim.Adam(self.brain.parameters(), lr=1e-3)
+
+        else:
+            self.brain = QNetwork(71, 4)
+            self.optimizer = torch.optim.Adam(self.brain.parameters(), lr=1e-3)
+        
 
     def build_state_tensor(self, grille: np.ndarray) -> torch.Tensor:
         """Construit l'état du réseau à partir de la grille, de la position et de l'énergie.
@@ -58,9 +66,6 @@ class Agent(object):
                 return q_values.argmax(dim=1).item()
             
 
-        
-
-
     def update(self, replay_buffer: ReplayBuffer, batch_size: int = 64, gamma: float = 0.99):
         """
         Met à jour le Q-network à partir d'un batch de transitions mémorisées.
@@ -95,6 +100,8 @@ class Agent(object):
         loss.backward()
         self.optimizer.step()
 
+        print(f"Loss = {loss.item()}")
+
         return loss.item()
 
     def action(self, environnement, grille: np.ndarray, epsilon: float = 0.0):
@@ -116,3 +123,12 @@ class Agent(object):
         reward = environnement.step(action_id)
         
         return action_id, reward
+
+    def save(self):
+        """
+        function to save the state of the qnetwork
+        """
+        torch.save(self.brain.state_dict(), "C:/A_Personnel/life_game/utils/brain.pth")
+        print("====== model enregistré ======")
+
+
