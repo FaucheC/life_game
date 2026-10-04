@@ -216,30 +216,22 @@ class Environnement(object):
 
     ########## Partie de l'environnement spécifique aux actions de l'agent #########################################
 
-    def compute_reward(self, agent: Agent, action_id, sucess):
+    def compute_reward(self, agent: Agent, action_id, success, ate_food=False):
         """
-        Calcul les récompenses de l'agent selon l'action prise
+        Calcule la récompense selon le résultat du déplacement.
+
+        La nourriture donne une récompense positive uniquement lorsqu'elle est
+        mangée. Un déplacement bloqué reçoit une petite pénalité.
         """
-        reward = 0
-
-        #survivre
-        reward += 0.1
-
-
-        # Le bonus de déplacement ne s'applique que si une nourriture existe.
-        distance = self.calcul_distance(agent)
-        if sucess and action_id in range(4) and distance is not None:
-            if np.sum(distance) < np.sum(self.best_distance):
-                reward += 0.5
-            else:
-                reward -= 0.5
-
-        #manger #########################
-
+        reward = 0.0
+        if success and action_id in range(4) and ate_food:
+            reward += 10.0
+        elif not success:
+            reward -= 0.1
 
         #pénalité si l'agent est mort
         if agent.energie <= 0:
-            reward = reward - 10
+            reward -= 10.0
 
 
         return reward
@@ -253,7 +245,10 @@ class Environnement(object):
 
     def moove(self, agent : Agent, dx = 1, dy = 1):
         """
-        Déplace l'agent
+        Déplace l'agent et indique si le mouvement a mangé une nourriture.
+
+        Returns:
+            tuple[bool, bool]: (déplacement réussi, nourriture mangée).
         """
         if agent.energie >= 0.5:
 
@@ -272,7 +267,7 @@ class Environnement(object):
                 or colonne < 0 or colonne >= self.grille.shape[1]
                 for ligne, colonne in nouvelle_position
             ):
-                return
+                return False, False
 
             # Repère la nourriture avant que les cellules de l'agent ne l'écrasent.
             positions_nourriture = {tuple(cellule) for cellule in self.find_food()}
@@ -295,6 +290,8 @@ class Environnement(object):
         if a_mange:
             self.eat(agent)
             self.add_food(agent, self.grille)
+
+        return True, a_mange
 
         #print(agent.position)
 
@@ -328,24 +325,27 @@ class Environnement(object):
 
         Args:
             action: Identifiant de direction (0: haut, 1: bas, 2: gauche, 3: droite).
+
+        Returns:
+            float: Récompense associée au résultat du déplacement.
         """
 
         if action == 0:
             # déplacement vers le haut
-            self.moove(self.agent, 0, -1)
+            success, ate_food = self.moove(self.agent, 0, -1)
         elif action == 1:
             # déplacement vers le bas
-            self.moove(self.agent, 0, 1)
+            success, ate_food = self.moove(self.agent, 0, 1)
         elif action == 2:
             # déplacement vers la gauche
-            self.moove(self.agent, -1, 0)
+            success, ate_food = self.moove(self.agent, -1, 0)
         elif action == 3:
             # déplacement vers la droite
-            self.moove(self.agent, 1, 0)
+            success, ate_food = self.moove(self.agent, 1, 0)
         else:
             raise ValueError("L'action doit être un entier entre 0 et 3.")
 
-        reward = self.compute_reward(self.agent, action, True)
+        reward = self.compute_reward(self.agent, action, success, ate_food)
         
         return reward
 
@@ -410,10 +410,11 @@ class Environnement(object):
 
         """
 
-        food_position = [random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1)]
+        food_position = (random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1))
+        positions_agent = {tuple(cellule) for cellule in agent.position}
 
-        while food_position in agent.position:
-            food_position = [random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1)]
+        while food_position in positions_agent:
+            food_position = (random.randint(0, self.lignes - 1), random.randint(0, self.colonnes - 1))
 
         grille[food_position[0]][food_position[1]] = 2
 

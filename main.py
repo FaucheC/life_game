@@ -114,6 +114,12 @@ if __name__ == "__main__":
 
             epsilon = max(epsilon_min, epsilon * epsilon_decay)
             if done:
+                # Recommence un épisode sans réinitialiser le réseau appris.
+                grille = grille_aleatoire(LIGNES, COLONNES, 0.2)
+                Env.grille = grille
+                resultat = Env.extraire_agents_potentiels(taille_min=2, connectivite=8)
+                agent.position = resultat["agents"][0]["cellules"]
+                agent.age = 0
                 agent.energie = 10
 
             grille = Env.grille
@@ -133,3 +139,4 @@ if __name__ == "__main__":
         pygame.display.flip()
         horloge.tick(10)  # 10 images par seconde (FPS)
 
+#TODO: Sauvegardez les poids du réseaux et charger le modèle si nécessaire
